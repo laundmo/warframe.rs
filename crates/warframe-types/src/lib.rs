@@ -1,5 +1,8 @@
 use derive_more::Display;
 use serde::de::DeserializeOwned;
+mod language;
+pub use language::Language;
+
 pub type DateTime = chrono::DateTime<chrono::Utc>;
 pub(crate) mod internal_prelude {
     pub use warframe_macros::endpoint;
@@ -24,7 +27,7 @@ impl Api for Market {
     const DEFAULT_ORIGIN: &str = "https://api.warframe.market";
 
     fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
-        parts.add_header("language", language);
+        parts.add_header("language", language.get_market_string());
     }
 }
 
@@ -88,12 +91,6 @@ impl HttpParts {
     }
 }
 
-// TODO: Temp while testing
-#[derive(Display)]
-pub enum Language {
-    en,
-}
-
 pub trait Api {
     const DEFAULT_ORIGIN: &str;
     fn new_with_language(language: Language) -> HttpParts {
@@ -155,7 +152,7 @@ mod test {
 
     #[test]
     fn test_endpoint() {
-        let mut parts = <TestEndpoint as Endpoint>::get_parts(super::Language::en);
+        let mut parts = <TestEndpoint as Endpoint>::get_parts(super::Language::EN);
 
         assert_eq!(parts.origin, "https://api.warframe.market");
         assert_eq!(parts.path, vec!["items"]);

@@ -8,8 +8,8 @@ use chrono::{
 };
 
 use crate::{
+    Language,
     internal_prelude::*,
-    worldstate::language::Language,
 };
 
 /// A news item

@@ -60,7 +60,6 @@ pub mod damage_type;
 pub mod deep_archimedea;
 pub mod global_upgrades;
 pub mod invasion;
-pub mod language;
 pub mod mission;
 pub mod mission_type;
 pub mod news;
