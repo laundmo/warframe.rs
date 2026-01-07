@@ -1,12 +1,11 @@
-use warframe_macros::model;
-
 use super::{
     faction::Faction,
     mission_type::MissionType,
 };
+use crate::internal_prelude::*;
 
 /// Represents Relic tiers
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub enum Tier {
     /// Lith
     Lith = 1,
@@ -23,8 +22,12 @@ pub enum Tier {
 }
 
 /// A Fissure Mission in which you can crack Void Relics
-#[model(endpoint = "/fissures", return_style = Array, timed)]
+#[endpoint(Worldstate:"/fissures" -> Vec<Self>)]
 pub struct Fissure {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The id of the fissure
     pub id: String,
 
@@ -68,9 +71,9 @@ mod test_fissure {
     use serde_json::from_str;
 
     use super::Fissure;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Fissure as Queryable>::Return;
+    type R = <Fissure as Endpoint>::Return;
 
     #[rstest]
     fn test(

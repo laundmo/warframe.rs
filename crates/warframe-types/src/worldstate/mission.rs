@@ -1,4 +1,4 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::{
     faction::Faction,
@@ -7,7 +7,7 @@ use super::{
 };
 
 /// A mission
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct Mission {
     /// The reward of this mission
     pub reward: Reward,

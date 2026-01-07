@@ -1,8 +1,12 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// Any current modifiers applied to all users, such as double drops, double XP, etc.
-#[model(endpoint = "/globalUpgrades", return_style = Array, timed)]
+#[endpoint(Worldstate:"/globalUpgrades" -> Vec<Self>)]
 pub struct GlobalUpgrade {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// What kind of upgrade
     pub upgrade: String,
 
@@ -25,9 +29,9 @@ mod test_global_upgrade {
     use serde_json::from_str;
 
     use super::GlobalUpgrade;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <GlobalUpgrade as Queryable>::Return;
+    type R = <GlobalUpgrade as Endpoint>::Return;
 
     #[rstest]
     fn test(

@@ -6,12 +6,15 @@ use chrono::{
     DateTime,
     Utc,
 };
-use warframe_macros::model;
 
-use crate::worldstate::Language;
+use crate::{
+    internal_prelude::*,
+    worldstate::language::Language,
+};
 
 /// A news item
-#[model(endpoint = "/news", return_style = Array)]
+#[endpoint(Worldstate:"/news" -> Vec<Self>)]
+
 pub struct News {
     /// The id of the News
     pub id: String,
@@ -59,9 +62,9 @@ mod test_news {
     use serde_json::from_str;
 
     use super::News;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <News as Queryable>::Return;
+    type R = <News as Endpoint>::Return;
 
     #[rstest]
     fn test(

@@ -13,12 +13,7 @@ use chrono::{
     DateTime,
     Utc,
 };
-use serde::{
-    Deserialize,
-    de::DeserializeOwned,
-};
-
-use crate::worldstate::language::Language;
+use serde::Deserialize;
 
 /// The `TimedEvent` trait defines methods that are related to timed events
 pub trait TimedEvent {
@@ -54,46 +49,6 @@ pub trait TimedEvent {
         !self.active() && !self.expired()
     }
 }
-
-/// Types implementing this have an actual endpoint on the API.
-pub trait Endpoint {
-    /// Returns the URL to the endpoint of the specified language.
-    ///
-    /// Getting this endpoint is __NOT__ free, as concatenating is done at runtime.
-    fn endpoint(base_url: &str, language: crate::worldstate::language::Language) -> String;
-}
-
-/// Marks a struct as `Queryable`.
-///
-/// Comes with a default implementation that works universally.
-pub trait Queryable: Endpoint + Clone + 'static {
-    /// The Type returned by the [query](Queryable::query).
-    type Return: DeserializeOwned + Send + Sync + Clone + 'static;
-
-    /// Queries a model and returns an instance of [`itself`](Queryable::Return).
-    #[must_use]
-    fn query(
-        base_url: &str,
-        request_executor: &reqwest::Client,
-        language: Language,
-    ) -> impl std::future::Future<Output = Result<Self::Return, Error>> + Send {
-        async move {
-            Ok(request_executor
-                .get(Self::endpoint(base_url, language))
-                .send()
-                .await?
-                .json::<Self::Return>()
-                .await?)
-        }
-    }
-}
-
-
-
-
-
-
-
 
 fn divmod<T>(number: T, other: T) -> (T, T)
 where
@@ -146,8 +101,6 @@ pub trait Opposite {
     #[must_use]
     fn opposite(&self) -> Self;
 }
-
-use crate::worldstate::error::Error;
 
 #[cfg(test)]
 mod tests {

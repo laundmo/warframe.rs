@@ -1,15 +1,20 @@
-use warframe_macros::model;
+use crate::{
+    internal_prelude::*,
+    worldstate::mission_type::MissionType,
+};
 
-use crate::worldstate::MissionType;
-
-#[model(endpoint = "/deepArchimedea", return_style = Object, timed)]
+#[endpoint(Worldstate:"/deepArchimedea" -> Self)]
 pub struct DeepArchimedea {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     pub id: String,
     pub missions: [DeepArchimedeaMission; 3],
     pub personal_modifiers: Vec<DeepArchimedeaModifier>,
 }
 
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct DeepArchimedeaMission {
     #[serde(rename = "mission")]
     pub r#type: MissionType,
@@ -17,7 +22,7 @@ pub struct DeepArchimedeaMission {
     pub risk_variables: Vec<DeepArchimedeaModifier>,
 }
 
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct DeepArchimedeaModifier {
     pub key: String,
     pub name: String,
@@ -26,7 +31,7 @@ pub struct DeepArchimedeaModifier {
 
 // COMMENTED OUT FOR NOW: unsure how they're related. Sticking to String fields for now
 
-// #[model]
+// #[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 // pub enum Deviation {
 //     /// Enemy guns launch large, slow moving orbs instead of their usual ordnance.
 //     ArcadeAutomata,
@@ -70,9 +75,9 @@ mod test_deep_archimedea {
     use serde_json::from_str;
 
     use super::DeepArchimedea;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <DeepArchimedea as Queryable>::Return;
+    type R = <DeepArchimedea as Endpoint>::Return;
 
     #[rstest]
     fn test(

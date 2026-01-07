@@ -1,9 +1,9 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::base::deserialize_f32_from_string;
 
 /// Construction percentages for showing how far constructed the enemy fleets are
-#[model(endpoint = "/constructionProgress", return_style = Object)]
+#[endpoint(Worldstate:"/constructionProgress" -> Self)]
 pub struct ConstructionProgress {
     /// The progress of the Fomorian
     #[serde(deserialize_with = "deserialize_f32_from_string")]
@@ -24,9 +24,9 @@ mod test_construction_progress {
     use serde_json::from_str;
 
     use super::ConstructionProgress;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <ConstructionProgress as Queryable>::Return;
+    type R = <ConstructionProgress as Endpoint>::Return;
 
     #[rstest]
     fn test(

@@ -1,11 +1,6 @@
 use serde::Deserialize;
 
-use super::{
-    i18n::I18N,
-    
-};
-
-
+use super::i18n::I18N;
 
 /// Represents the `/lich/weapons` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]

@@ -1,8 +1,8 @@
 #![allow(clippy::doc_markdown)]
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// A Syndicate in Warframe
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 #[non_exhaustive]
 pub enum Syndicate {
     /// ArbitersOfHexis

@@ -1,7 +1,7 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// Represents the state on Orb Vallis
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum OrbVallisState {
     /// Warm
@@ -11,8 +11,12 @@ pub enum OrbVallisState {
 }
 
 /// The current cycle of the Orb Vallis warm/cold cycle
-#[model(endpoint = "/vallisCycle", return_style = Object, timed)]
+#[endpoint(Worldstate:"/vallisCycle" -> Self)]
 pub struct OrbVallis {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// Unique identifier for this object/event/thing
     pub id: String,
 
@@ -26,9 +30,9 @@ mod test_orb_vallis {
     use serde_json::from_str;
 
     use super::OrbVallis;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <OrbVallis as Queryable>::Return;
+    type R = <OrbVallis as Endpoint>::Return;
 
     #[rstest]
     fn test(

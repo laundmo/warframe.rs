@@ -1,11 +1,6 @@
 use serde::Deserialize;
 
-use super::{
-    i18n::I18N,
-    
-};
-
-
+use super::i18n::I18N;
 
 /// Represents the `/locations` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]
@@ -58,10 +53,7 @@ pub enum Faction {
 #[cfg(test)]
 mod test {
     use super::Location;
-    use crate::market::{
-        
-        ResponseBase,
-    };
+    use crate::market::ResponseBase;
 
     #[rstest::rstest]
     fn location(

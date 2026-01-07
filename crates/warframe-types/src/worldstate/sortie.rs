@@ -1,9 +1,9 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::faction::Faction;
 
 /// A Mission corresponding to a Sortie
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct SortieMission {
     /// The i18n Mission type of this mission
     pub mission_type: String,
@@ -20,8 +20,12 @@ pub struct SortieMission {
 }
 
 /// Data about the missions for the current sortie
-#[model(endpoint = "/sortie", return_style = Object, timed)]
+#[endpoint(Worldstate:"/sortie" -> Self)]
 pub struct Sortie {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// Unique identifier for this object/event/thing
     pub id: String,
 
@@ -42,9 +46,9 @@ mod test_sortie {
     use serde_json::from_str;
 
     use super::Sortie;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Sortie as Queryable>::Return;
+    type R = <Sortie as Endpoint>::Return;
 
     #[rstest]
     fn test(

@@ -1,7 +1,7 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// An Item in Teshin's Shop
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct SteelPathShopItem {
     /// The i18n Name of the Item
     pub name: String,
@@ -11,8 +11,12 @@ pub struct SteelPathShopItem {
 }
 
 /// Data about steel path offerings
-#[model(endpoint = "/steelPath", return_style = Object, timed)]
+#[endpoint(Worldstate:"/steelPath" -> Self)]
 pub struct SteelPath {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The current weekly offer
     #[serde(rename = "currentReward")]
     pub current_offer: SteelPathShopItem,
@@ -30,9 +34,9 @@ mod test_steel_path {
     use serde_json::from_str;
 
     use super::SteelPath;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <SteelPath as Queryable>::Return;
+    type R = <SteelPath as Endpoint>::Return;
 
     #[rstest]
     fn test(

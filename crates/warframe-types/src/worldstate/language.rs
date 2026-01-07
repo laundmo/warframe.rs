@@ -1,12 +1,5 @@
-//! Adds an enum that represents the different languages that are supported by the API
-
-use core::str;
-
-use warframe_macros::model;
-
 /// An enumeration representing various supported languages.
-#[model]
-#[derive(Ord)]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize, PartialOrd, Eq, Ord, Hash)]
 #[serde(rename_all = "lowercase")]
 pub enum Language {
     /// German (`DE`)

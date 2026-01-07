@@ -60,6 +60,7 @@ pub mod damage_type;
 pub mod deep_archimedea;
 pub mod global_upgrades;
 pub mod invasion;
+pub mod language;
 pub mod mission;
 pub mod mission_type;
 pub mod news;
@@ -72,62 +73,55 @@ pub mod steel_path;
 pub mod syndicate;
 pub mod syndicate_mission;
 pub mod void_trader;
-
 use items::Item;
-
-use super::{
-    client::Client,
-    error::Error,
-    language::Language,
-};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Deserialize)]
 pub struct ItemStringWrapper(String);
 
 impl ItemStringWrapper {
-    /// Queries an item using the provided client.
-    ///
-    /// This is a convenience function.
-    ///
-    /// # Arguments
-    ///
-    /// * `client` - The client used to query the item.
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if it
-    /// fails.
-    ///
-    /// # Errors
-    ///
-    /// This function will return an error if the client fails to query the item.
-    pub async fn query(&self, client: Client) -> Result<Option<Item>, Error> {
-        client.query_item(&self.0).await
-    }
+    //     /// Queries an item using the provided client.
+    //     ///
+    //     /// This is a convenience function.
+    //     ///
+    //     /// # Arguments
+    //     ///
+    //     /// * `client` - The client used to query the item.
+    //     ///
+    //     /// # Returns
+    //     ///
+    //     /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if
+    // it     /// fails.
+    //     ///
+    //     /// # Errors
+    //     ///
+    //     /// This function will return an error if the client fails to query the item.
+    //     pub async fn query(&self, client: Client) -> Result<Option<Item>, Error> {
+    //         client.query_item(&self.0).await
+    //     }
 
-    /// Queries an item using the provided client with the provided localization
-    ///
-    /// This is a convenience function.
-    ///
-    /// # Arguments
-    ///
-    /// * `client` - The client used to query the item.
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if it
-    /// fails.
-    ///
-    /// # Errors
-    ///
-    /// This function will return an error if the client fails to query the item.
-    pub async fn query_using_lang(
-        &self,
-        client: Client,
-        language: Language,
-    ) -> Result<Option<Item>, Error> {
-        client.query_item_using_lang(&self.0, language).await
-    }
+    //     /// Queries an item using the provided client with the provided localization
+    //     ///
+    //     /// This is a convenience function.
+    //     ///
+    //     /// # Arguments
+    //     ///
+    //     /// * `client` - The client used to query the item.
+    //     ///
+    //     /// # Returns
+    //     ///
+    //     /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if
+    // it     /// fails.
+    //     ///
+    //     /// # Errors
+    //     ///
+    //     /// This function will return an error if the client fails to query the item.
+    //     pub async fn query_using_lang(
+    //         &self,
+    //         client: Client,
+    //         language: Language,
+    //     ) -> Result<Option<Item>, Error> {
+    //         client.query_item_using_lang(&self.0, language).await
+    //     }
 
     #[must_use]
     pub fn inner(&self) -> &str {

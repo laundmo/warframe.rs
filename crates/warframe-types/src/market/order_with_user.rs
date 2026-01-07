@@ -1,12 +1,9 @@
 use serde::Deserialize;
 
 use super::{
-    
     order::Order,
     user_short::UserShort,
 };
-
-
 
 /// Represents the `/orders/recent` endpoint.
 /// Get the most recent orders.
@@ -25,10 +22,7 @@ pub struct OrderWithUser {
 #[cfg(test)]
 mod test {
     use super::OrderWithUser;
-    use crate::market::{
-        
-        ResponseBase,
-    };
+    use crate::market::ResponseBase;
 
     #[rstest::rstest]
     fn order_with_user(

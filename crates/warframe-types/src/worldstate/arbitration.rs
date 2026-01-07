@@ -1,47 +1,52 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
 use serde::{
     Deserialize,
     Deserializer,
 };
-use warframe_macros::model;
 
 use super::{
     base::TimedEvent,
     faction::Faction,
     mission_type::MissionType,
 };
+use crate::internal_prelude::*;
 
-fn deserialize_expiry<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
+fn deserialize_expiry<'de, D>(deserializer: D) -> Result<Option<DateTime>, D::Error>
 where
     D: Deserializer<'de>,
 {
     let s: &str = Deserialize::deserialize(deserializer)?;
-    DateTime::parse_from_rfc3339(s)
-        .map(|dt| dt.with_timezone(&Utc))
-        .or_else(|err| {
-            if matches!(
-                err.kind(),
-                chrono::format::ParseErrorKind::OutOfRange
-                    | chrono::format::ParseErrorKind::Invalid
-            ) {
-                Ok(DateTime::<Utc>::MAX_UTC)
-            } else {
-                Err(serde::de::Error::custom(err.to_string()))
-            }
-        })
+
+    Ok(Some(
+        chrono::DateTime::parse_from_rfc3339(s)
+            .map(|dt| dt.with_timezone(&chrono::Utc))
+            .or_else(|err| {
+                if matches!(
+                    err.kind(),
+                    chrono::format::ParseErrorKind::OutOfRange
+                        | chrono::format::ParseErrorKind::Invalid
+                ) {
+                    Ok(DateTime::MAX_UTC)
+                } else {
+                    Err(serde::de::Error::custom(err.to_string()))
+                }
+            })?,
+    ))
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct EventTimes {
+    activation: Option<DateTime>,
+    #[serde[deserialize_with = "deserialize_expiry"]]
+    expiry: Option<DateTime>,
 }
 
 /// Information about an arbitration
-#[model(
-    endpoint = "/arbitration",
-    return_style = Object,
-    timed,
-    expiry(serde(deserialize_with = "deserialize_expiry")),
-)]
+#[endpoint(Worldstate:"/arbitration" -> Self)]
 pub struct Arbitration {
+    /// Event times
+    #[serde(flatten)]
+    pub times: EventTimes,
+
     /// The i18n of the node
     pub node: String,
 
@@ -75,7 +80,7 @@ impl Arbitration {
     /// Whether the arbitration is still valid.
     #[must_use]
     pub fn is_valid(&self) -> bool {
-        self.expiry() != DateTime::<Utc>::MAX_UTC
+        self.times.expiry.is_some_and(|dt| dt != DateTime::MAX_UTC)
     }
 }
 
@@ -85,9 +90,9 @@ mod test_arbitration {
     use serde_json::from_str;
 
     use super::Arbitration;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Arbitration as Queryable>::Return;
+    type R = <Arbitration as Endpoint>::Return;
 
     #[rstest]
     fn test(

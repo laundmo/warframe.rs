@@ -1,7 +1,7 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// Represents the current state on cetus
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum CetusState {
     /// Represents Cetus' day state
@@ -11,8 +11,12 @@ pub enum CetusState {
 }
 
 /// The Information about cetus
-#[model(endpoint = "/cetusCycle", return_style = Object, timed)]
+#[endpoint(Worldstate:"/cetusCycle" -> Self)]
 pub struct Cetus {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The id of the cycle
     pub id: String,
 
@@ -26,9 +30,9 @@ mod test_cetus {
     use serde_json::from_str;
 
     use super::Cetus;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Cetus as Queryable>::Return;
+    type R = <Cetus as Endpoint>::Return;
 
     #[rstest]
     fn test(

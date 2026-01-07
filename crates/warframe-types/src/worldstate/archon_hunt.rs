@@ -1,12 +1,11 @@
-use warframe_macros::model;
-
 use super::{
     faction::Faction,
     mission_type::MissionType,
 };
+use crate::internal_prelude::*;
 
 /// An archon hunt mission
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct ArchonHuntMission {
     /// The i18n of the node
     pub node: String,
@@ -37,8 +36,12 @@ pub struct ArchonHuntMission {
 }
 
 /// An alert in Warframe
-#[model(endpoint = "/archonHunt", return_style = Object, timed)]
+#[endpoint(Worldstate:"/archonHunt" -> Self)]
 pub struct ArchonHunt {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// ID of this event
     pub id: String,
 
@@ -64,9 +67,9 @@ mod test_archonhunt {
     use serde_json::from_str;
 
     use super::ArchonHunt;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <ArchonHunt as Queryable>::Return;
+    type R = <ArchonHunt as Endpoint>::Return;
 
     #[rstest]
     fn test(

@@ -1,12 +1,12 @@
-use warframe_macros::model;
-
 use super::{
     mission::Mission,
     reward_type::RewardType,
 };
+use crate::internal_prelude::*;
 
 /// An alert in Warframe
-#[model(endpoint = "/alerts", return_style = Array)]
+#[endpoint(Worldstate:"/alerts" -> Vec<Self>)]
+
 pub struct Alert {
     /// ID of this event
     pub id: String,
@@ -24,9 +24,9 @@ mod test_alert {
     use serde_json::from_str;
 
     use super::Alert;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Alert as Queryable>::Return;
+    type R = <Alert as Endpoint>::Return;
 
     #[rstest]
     fn test(

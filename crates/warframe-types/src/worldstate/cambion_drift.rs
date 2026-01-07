@@ -1,7 +1,7 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// The State of the Cambion Drift
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum CambionDriftState {
     /// The 'Vome' state
@@ -11,8 +11,12 @@ pub enum CambionDriftState {
 }
 
 /// Cambion Drift info
-#[model(endpoint = "/cambionCycle", return_style = Object, timed)]
+#[endpoint(Worldstate:"/cambionCycle" -> Self)]
 pub struct CambionDrift {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The id of the cycle
     pub id: String,
 
@@ -26,9 +30,9 @@ mod test_cambion_drift {
     use serde_json::from_str;
 
     use super::CambionDrift;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <CambionDrift as Queryable>::Return;
+    type R = <CambionDrift as Endpoint>::Return;
 
     #[rstest]
     fn test(

@@ -1,5 +1,16 @@
 use derive_more::Display;
 use serde::de::DeserializeOwned;
+pub type DateTime = chrono::DateTime<chrono::Utc>;
+pub(crate) mod internal_prelude {
+    pub use warframe_macros::endpoint;
+
+    pub use super::{
+        DateTime,
+        Market,
+        Worldstate,
+    };
+}
+use internal_prelude::*;
 
 #[cfg(feature = "market")]
 pub mod market;
@@ -7,6 +18,33 @@ pub mod market;
 pub mod profile;
 #[cfg(feature = "worldstate")]
 pub mod worldstate;
+
+pub struct Market;
+impl Api for Market {
+    const DEFAULT_ORIGIN: &str = "https://api.warframe.market";
+
+    fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
+        parts.add_header("language", language);
+    }
+}
+
+pub struct Worldstate;
+impl Api for Worldstate {
+    const DEFAULT_ORIGIN: &str = "";
+    fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
+        parts.add_query("language", language);
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EventTimes {
+    pub activation: Option<DateTime>,
+    pub expiry: Option<DateTime>,
+}
+pub trait TimedGetter {
+    fn get(&self) -> EventTimes;
+}
 
 #[derive(Default, Debug)]
 pub struct HttpParts {

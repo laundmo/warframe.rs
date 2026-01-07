@@ -2,12 +2,9 @@ use serde::Deserialize;
 
 use super::{
     i18n::I18N,
-    
     riven_group::RivenGroup,
     riven_type::RivenType,
 };
-
-
 
 /// Represents the `/riven/weapons` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]
@@ -36,10 +33,7 @@ pub struct RivenI18N {
 #[cfg(test)]
 mod test {
     use super::Riven;
-    use crate::market::{
-        
-        ResponseBase,
-    };
+    use crate::market::ResponseBase;
 
     #[rstest::rstest]
     fn riven(

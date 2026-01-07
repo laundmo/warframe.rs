@@ -1,8 +1,8 @@
 #![allow(clippy::doc_markdown)]
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// A Mission Type in Warframe
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub enum MissionType {
     /// AncientRetribution
     #[serde(rename = "Ancient Retribution")]

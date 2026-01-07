@@ -1,4 +1,4 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::damage_type::{
     CombinedElementalDamage,
@@ -8,7 +8,7 @@ use super::damage_type::{
 };
 
 /// A Faction in Warframe
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub enum Faction {
     /// Orokin
     Orokin,

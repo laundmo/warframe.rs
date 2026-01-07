@@ -1,11 +1,6 @@
 use serde::Deserialize;
 
-use super::{
-    i18n::I18N,
-    
-};
-
-
+use super::i18n::I18N;
 
 /// Represents the `/sister/ephemeras` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]
@@ -30,10 +25,7 @@ pub struct SisterEphemeraI18N {
 #[cfg(test)]
 mod test {
     use super::SisterEphemera;
-    use crate::market::{
-        
-        ResponseBase,
-    };
+    use crate::market::ResponseBase;
 
     #[rstest::rstest]
     fn lich_ephemera(

@@ -1,9 +1,9 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::ItemStringWrapper;
 
 /// An Item in Baro's inventory
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct VoidTraderInventoryItem {
     /// The item that is being sold
     pub item: ItemStringWrapper,
@@ -16,8 +16,12 @@ pub struct VoidTraderInventoryItem {
 }
 
 /// Information on the current Void Trader offerings, or when he will arrive
-#[model(endpoint = "/voidTrader", return_style = Object, timed)]
+#[endpoint(Worldstate:"/voidTrader" -> Self)]
 pub struct VoidTrader {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// Unique identifier for this object/event/thing
     pub id: String,
 
@@ -34,9 +38,9 @@ mod test_void_trader {
     use serde_json::from_str;
 
     use super::VoidTrader;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <VoidTrader as Queryable>::Return;
+    type R = <VoidTrader as Endpoint>::Return;
 
     #[rstest]
     fn test(

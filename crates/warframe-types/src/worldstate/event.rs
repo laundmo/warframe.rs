@@ -1,4 +1,4 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::{
     faction::Faction,
@@ -7,8 +7,12 @@ use super::{
 };
 
 /// An Event in Warframe
-#[model(endpoint = "/events", return_style = Array, timed)]
+#[endpoint(Worldstate:"/events" -> Vec<Self>)]
 pub struct Event {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// Maximum score to complete the event
     pub maximum_score: Option<i32>,
 
@@ -58,9 +62,9 @@ mod test_event {
     use serde_json::from_str;
 
     use super::Event;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Event as Queryable>::Return;
+    type R = <Event as Endpoint>::Return;
 
     #[rstest]
     fn test(

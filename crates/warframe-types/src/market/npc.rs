@@ -1,11 +1,6 @@
 use serde::Deserialize;
 
-use super::{
-    i18n::I18N,
-    
-};
-
-
+use super::i18n::I18N;
 
 /// Represents the `/npcs` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]
@@ -28,10 +23,7 @@ pub struct NpcI18N {
 #[cfg(test)]
 mod test {
     use super::Npc;
-    use crate::market::{
-        
-        ResponseBase,
-    };
+    use crate::market::ResponseBase;
 
     #[rstest::rstest]
     fn npc(

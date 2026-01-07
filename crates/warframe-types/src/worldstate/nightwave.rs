@@ -1,7 +1,9 @@
-use warframe_macros::model;
+use serde::Deserialize;
+
+use crate::internal_prelude::*;
 
 /// Represents the difficulty of a [Nightwave Challenge](NightwaveChallenge)
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub enum NightwaveChallengeType {
     /// Easy
     Easy,
@@ -14,8 +16,12 @@ pub enum NightwaveChallengeType {
 }
 
 /// A Nightwave challenge
-#[model(timed)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 pub struct NightwaveChallenge {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The ID of this challenge
     pub id: String,
 
@@ -63,8 +69,12 @@ impl NightwaveChallenge {
 }
 
 /// The Current cycle and challenges of Nightwave, a battle-pass-esque rotation and challenge system
-#[model(endpoint = "/nightwave", return_style = Object, timed)]
+#[endpoint(Worldstate:"/nightwave" -> Self)]
 pub struct Nightwave {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The ID of the Nightwave
     pub id: String,
 
@@ -87,9 +97,9 @@ mod test_nightwave {
     use serde_json::from_str;
 
     use super::Nightwave;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Nightwave as Queryable>::Return;
+    type R = <Nightwave as Endpoint>::Return;
 
     #[rstest]
     fn test(

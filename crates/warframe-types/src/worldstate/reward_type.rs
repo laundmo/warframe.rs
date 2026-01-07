@@ -1,8 +1,8 @@
 #![allow(clippy::doc_markdown)]
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// Represents different reward types
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum RewardType {
     /// Vauban

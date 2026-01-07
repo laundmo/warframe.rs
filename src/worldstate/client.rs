@@ -13,6 +13,7 @@ use std::{
 };
 
 use moka::future::Cache;
+use warframe_types::Endpoint;
 
 use super::{
     Queryable,
@@ -314,5 +315,37 @@ impl Client {
             .await
         })
         .await
+    }
+}
+
+trait Queryable: Endpoint {
+    /// Send a query with the default domain
+    fn query(
+        client: &reqwest::Client,
+        language: dummy::Language,
+    ) -> impl std::future::Future<Output = Result<Self::Return, Error>> + Send {
+        Self::query_with_domain(None, client, language)
+    }
+    /// Send a query, optionally specifying the domain
+    fn query_with_domain(
+        domain: Option<&str>,
+        client: &reqwest::Client,
+        language: dummy::Language,
+    ) -> impl std::future::Future<Output = Result<Self::Return, Error>> + Send {
+        let mut req = Self::get_parts(language);
+        if let Some(domain) = domain {
+            req.set_origin(domain);
+        }
+        async move {
+            let url = format!("{}/{}", req.origin, req.path.join("/"));
+            let mut builder = client.get(url);
+            for q in req.query.iter() {
+                builder = builder.query(q);
+            }
+            for (k, v) in req.header.iter() {
+                builder = builder.header(k, v);
+            }
+            Ok(builder.send().await?.json::<Self::Return>().await?)
+        }
     }
 }

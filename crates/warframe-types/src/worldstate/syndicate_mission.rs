@@ -1,11 +1,12 @@
-use warframe_macros::model;
-
-use crate::worldstate::queryable::Syndicate;
+use crate::{
+    internal_prelude::*,
+    worldstate::syndicate::Syndicate,
+};
 
 type DateTime = chrono::DateTime<chrono::Utc>;
 
 /// A Syndicate Job (aka Bounty)
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct SyndicateJob {
     /// Unique identifier for this object/event/thing
     pub id: String,
@@ -33,8 +34,12 @@ pub struct SyndicateJob {
 
 /// All Syndicate Missions (including Cetus, etc.)\nNote that they *may* be empty, in which case
 /// they are not valid.
-#[model(endpoint =  "/syndicateMissions", return_style = Array, timed)]
+#[endpoint(Worldstate:"/syndicateMissions" -> Vec<Self>)]
 pub struct SyndicateMission {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// Unique identifier for this object/event/thing
     pub id: String,
 
@@ -57,9 +62,9 @@ mod test_syndicate_mission {
     use serde_json::from_str;
 
     use super::SyndicateMission;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <SyndicateMission as Queryable>::Return;
+    type R = <SyndicateMission as Endpoint>::Return;
 
     #[rstest]
     fn test(

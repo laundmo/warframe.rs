@@ -1,4 +1,4 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::{
     faction::Faction,
@@ -9,7 +9,7 @@ use super::{
 type DateTime = chrono::DateTime<chrono::Utc>;
 
 /// An defender/attacker of an Invasion
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct InvasionMember {
     /// The reward of the mission.
     pub reward: Option<Reward>,
@@ -22,7 +22,8 @@ pub struct InvasionMember {
 }
 
 /// An Invasion
-#[model(endpoint = "/invasions", return_style = Array)]
+#[endpoint(Worldstate:"/invasions" -> Vec<Self>)]
+
 pub struct Invasion {
     /// The time the Invasion began
     pub activation: DateTime,
@@ -68,9 +69,9 @@ mod test_invasion {
     use serde_json::from_str;
 
     use super::Invasion;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <Invasion as Queryable>::Return;
+    type R = <Invasion as Endpoint>::Return;
 
     #[rstest]
     fn test(

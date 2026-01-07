@@ -1,10 +1,14 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::ItemStringWrapper;
 
 /// Popular Deals, discounts, featured deals
-#[model(endpoint = "/flashSales", return_style = Array, timed)]
+#[endpoint(Worldstate:"/flashSales" -> Vec<Self>)]
 pub struct FlashSale {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The item being sold
     pub item: ItemStringWrapper,
 
@@ -30,9 +34,9 @@ mod test_flash_sale {
     use serde_json::from_str;
 
     use super::FlashSale;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <FlashSale as Queryable>::Return;
+    type R = <FlashSale as Endpoint>::Return;
 
     #[rstest]
     fn test(

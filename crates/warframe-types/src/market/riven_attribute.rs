@@ -1,11 +1,6 @@
 use serde::Deserialize;
 
-use super::{
-    i18n::I18N,
-    
-};
-
-
+use super::i18n::I18N;
 
 /// Represents the `/riven/attributes` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]
@@ -68,10 +63,7 @@ pub enum Unit {
 #[cfg(test)]
 mod test {
     use super::RivenAttribute;
-    use crate::market::{
-        
-        ResponseBase,
-    };
+    use crate::market::ResponseBase;
 
     #[rstest::rstest]
     fn riven_attribute(

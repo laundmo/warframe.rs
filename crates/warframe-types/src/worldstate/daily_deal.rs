@@ -1,10 +1,14 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 use super::ItemStringWrapper;
 
 /// Info about the Daily Deal(s)
-#[model(endpoint = "/dailyDeals", return_style = Array, timed)]
+#[endpoint(Worldstate:"/dailyDeals" -> Vec<Self>)]
 pub struct DailyDeal {
+    /// Event times
+    #[serde(flatten)]
+    pub times: crate::EventTimes,
+
     /// The Item being sold
     pub item: ItemStringWrapper,
 
@@ -33,9 +37,9 @@ mod test_daily_deal {
     use serde_json::from_str;
 
     use super::DailyDeal;
-    use crate::worldstate::Queryable;
+    use crate::Endpoint;
 
-    type R = <DailyDeal as Queryable>::Return;
+    type R = <DailyDeal as Endpoint>::Return;
 
     #[rstest]
     fn test(

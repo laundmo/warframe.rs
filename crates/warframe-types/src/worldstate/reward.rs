@@ -1,7 +1,7 @@
-use warframe_macros::model;
+use crate::internal_prelude::*;
 
 /// Small info about how many of which items are given
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct CountedItem {
     /// How many of this item
     pub count: i32,
@@ -11,7 +11,7 @@ pub struct CountedItem {
 }
 
 /// The reward of this event
-#[model]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub struct Reward {
     /// Items that have a quantity attached
     pub counted_items: Vec<CountedItem>,

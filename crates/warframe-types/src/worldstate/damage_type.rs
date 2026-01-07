@@ -1,5 +1,14 @@
-use serde::Deserialize;
-use serde_with::rust::deserialize_ignore_any;
+use serde::{
+    Deserialize,
+    Deserializer,
+    de::IgnoredAny,
+};
+
+pub fn deserialize_ignore_any<'de, D: Deserializer<'de>, T: Default>(
+    deserializer: D,
+) -> Result<T, D::Error> {
+    IgnoredAny::deserialize(deserializer).map(|_| T::default())
+}
 
 macro_rules! unordered_pattern {
     ($a:pat, $b:pat) => {
