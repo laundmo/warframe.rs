@@ -1,0 +1,29 @@
+[package]
+name = "warframe-types"
+version = "9.0.1"
+edition = "2024"
+description = "Types for the `warframe` crate."
+readme = "../README.md"
+documentation = "https://docs.rs/warframe-types"
+homepage = "https://docs.rs/warframe-types"
+repository = "https://github.com/WFCD/warframe.rs"
+license = "MIT"
+rust-version = "1.85"
+
+[features]
+# default = ["market", "worldstate"]
+market = []
+worldstate = []
+profile = []
+
+
+[dependencies]
+warframe-macros = { workspace = true }
+chrono = { workspace = true }
+serde = { workspace = true }
+derive_more = { workspace = true }
+
+[dev-dependencies]
+rstest = "0.25.0"
+tracing-subscriber = "0.3.22"
+serde_json = { workspace = true }

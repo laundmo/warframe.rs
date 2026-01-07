@@ -5,7 +5,7 @@
 pub(crate) mod cache;
 mod client;
 pub mod error;
-pub(crate) mod models;
+pub mod models;
 
 #[cfg(feature = "market_cache")]
 pub use cache::{
