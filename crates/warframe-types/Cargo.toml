@@ -13,16 +13,17 @@ rust-version = "1.85"
 [features]
 # default = ["market", "worldstate"]
 market = []
-worldstate = []
+worldstate = ["dep:chrono"]
 profile = []
 
 
 [dependencies]
 warframe-macros = { workspace = true }
-chrono = { workspace = true }
+chrono = { workspace = true, optional = true }
 serde = { workspace = true }
 derive_more = { workspace = true }
 serde_json = { workspace = true }
+serde_repr = { workspace = true }
 
 [dev-dependencies]
 rstest = "0.25.0"

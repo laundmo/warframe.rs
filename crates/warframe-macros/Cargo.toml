@@ -18,3 +18,7 @@ manyhow = { version = "0.11.4" }
 proc-macro2 = { version = "1.0.104" }
 quote = { version = "1.0.42" }
 syn = { version = "2.0.111", features = ["full"] }
+
+[features]
+default = ["worldstate"]
+worldstate = []

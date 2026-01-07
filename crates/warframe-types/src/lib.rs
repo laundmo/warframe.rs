@@ -1,9 +1,7 @@
-use derive_more::Display;
 use serde::de::DeserializeOwned;
 mod language;
 pub use language::Language;
 
-pub type DateTime = chrono::DateTime<chrono::Utc>;
 pub(crate) mod internal_prelude {
     pub(crate) use warframe_macros::{
         endpoint,
@@ -11,9 +9,14 @@ pub(crate) mod internal_prelude {
     };
 
     pub(crate) use super::{
-        DateTime,
         Market,
         Worldstate,
+    };
+    #[cfg(feature = "worldstate")]
+    pub(crate) use crate::worldstate::base::{
+        DateTime,
+        EventTimes,
+        TimedEvent,
     };
 }
 use internal_prelude::*;
@@ -40,16 +43,6 @@ impl Api for Worldstate {
     fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
         parts.add_query("language", language);
     }
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct EventTimes {
-    pub activation: Option<DateTime>,
-    pub expiry: Option<DateTime>,
-}
-pub trait TimedGetter {
-    fn get(&self) -> EventTimes;
 }
 
 #[derive(Default, Debug)]

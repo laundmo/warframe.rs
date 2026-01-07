@@ -9,19 +9,23 @@ use std::{
     },
 };
 
-use chrono::{
-    DateTime,
-    Utc,
-};
 use serde::Deserialize;
+pub type DateTime = chrono::DateTime<chrono::Utc>;
+
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EventTimes {
+    pub activation: Option<DateTime>,
+    pub expiry: Option<DateTime>,
+}
 
 /// The `TimedEvent` trait defines methods that are related to timed events
 pub trait TimedEvent {
     /// The time when the event began
-    fn activation(&self) -> DateTime<Utc>;
+    fn activation(&self) -> DateTime;
 
     /// The time when the event ends
-    fn expiry(&self) -> DateTime<Utc>;
+    fn expiry(&self) -> DateTime;
 
     /// Short-time-formatted duration string representing the start of the event
     fn start_string(&self) -> String {
@@ -76,8 +80,8 @@ where
 ///
 /// a formatted string representing the time difference between the current time and the provided
 /// `DateTime` value.
-pub(crate) fn get_short_format_time_string(dt: DateTime<Utc>) -> String {
-    let now = Utc::now();
+pub(crate) fn get_short_format_time_string(dt: DateTime) -> String {
+    let now = chrono::Utc::now();
     let mut time_in_between = (if now > dt { now - dt } else { dt - now }).num_seconds();
 
     let components = [("h", 60 * 60), ("m", 60), ("s", 1)];

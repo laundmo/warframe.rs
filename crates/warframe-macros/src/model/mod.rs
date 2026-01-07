@@ -17,7 +17,7 @@ mod enum_impl;
 pub fn parse_struct(args: TokenStream, mut item: ItemStruct) -> syn::Result<TokenStream> {
     let mut vdq = VecDeque::from(item.attrs.clone());
     vdq.push_front(syn::parse_quote!(#[serde(rename_all = "camelCase")]));
-    vdq.push_front(syn::parse_quote!(#[derive(::core::fmt::Debug, ::core::clone::Clone, ::core::cmp::PartialEq, serde::Deserialize)]));
+    vdq.push_front(syn::parse_quote!(#[derive(::core::fmt::Debug, ::core::clone::Clone, ::core::cmp::PartialEq, serde::Deserialize, ::warframe_macros::TimedEvent)]));
     item.attrs = vdq.into();
 
     Ok(item.to_token_stream())

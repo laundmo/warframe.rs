@@ -1,3 +1,4 @@
+mod derive_timedevent;
 mod endpoint;
 mod model;
 
@@ -27,4 +28,10 @@ pub fn model(args: TokenStream, item: TokenStream) -> syn::Result<TokenStream> {
 #[proc_macro_attribute]
 pub fn endpoint(args: TokenStream, item: TokenStream) -> syn::Result<TokenStream> {
     endpoint::expand(args.into(), item.into()).map(Into::into)
+}
+
+#[manyhow]
+#[proc_macro_derive(TimedEvent)]
+pub fn derive_timedevent(item: syn::DeriveInput) -> syn::Result<TokenStream> {
+    derive_timedevent::expand(item)
 }
