@@ -9,40 +9,16 @@ pub mod profile;
 pub mod worldstate;
 
 #[derive(Default, Debug)]
-pub struct BasicRequest {
-    schema: String,
-    host: String,
-    path: Vec<String>,
-    query: Vec<(String, String)>,
-    header: Vec<(String, String)>,
+pub struct HttpParts {
+    pub origin: String,
+    pub path: Vec<String>,
+    pub query: Vec<(String, String)>,
+    pub header: Vec<(String, String)>,
 }
-impl BasicRequest {
-    pub fn get_url(&self) -> String {
-        let path = self.path.join("/");
-        let mut base_url = format!("{}://{}/{}", self.schema, self.host, path);
-        for (i, (k, v)) in self.query.iter().enumerate() {
-            if i == 0 {
-                base_url += &format!("?{k}={v}");
-            } else {
-                base_url += &format!("&{k}={v}");
-            }
-        }
-        base_url
-    }
-    pub fn set_schema(&mut self, schema: impl ToString) -> &mut Self {
-        self.schema = schema.to_string();
+impl HttpParts {
+    pub fn set_origin(&mut self, origin: impl ToString) -> &mut Self {
+        self.origin = origin.to_string();
         self
-    }
-    pub fn set_host(&mut self, host: impl ToString) -> &mut Self {
-        self.host = host.to_string();
-        self
-    }
-    pub fn set_domain(&mut self, domain: impl ToString) -> &mut Self {
-        let domain = domain.to_string();
-        let (schema, host) = domain
-            .split_once("://")
-            .expect("Could not split domain into schema and host parts");
-        self.set_schema(schema).set_host(host)
     }
     pub fn set_path(&mut self, path: impl ToString) -> &mut Self {
         let path = path.to_string();
@@ -58,9 +34,6 @@ impl BasicRequest {
             .for_each(|s| self.path.push(s.to_string()));
         self
     }
-    pub fn path_mut(&mut self) -> &mut [String] {
-        &mut self.path
-    }
     pub fn add_query(&mut self, key: impl ToString, value: impl ToString) -> &mut Self {
         self.query.push((
             key.to_string().to_lowercase(),
@@ -68,18 +41,12 @@ impl BasicRequest {
         ));
         self
     }
-    pub fn query_mut(&mut self) -> &mut [(String, String)] {
-        &mut self.query
-    }
     pub fn add_header(&mut self, key: impl ToString, value: impl ToString) -> &mut Self {
         self.header.push((
             key.to_string().to_lowercase(),
             value.to_string().to_lowercase(),
         ));
         self
-    }
-    pub fn header_mut(&mut self) -> &mut [(String, String)] {
-        &mut self.header
     }
 }
 
@@ -89,66 +56,49 @@ pub enum Language {
     en,
 }
 
-trait Api {
-    const DEFAULT_DOMAIN: &str;
-    fn request() -> BasicRequest {
-        let mut r = BasicRequest::default();
-        r.set_domain(Self::DEFAULT_DOMAIN);
-        r
+pub trait Api {
+    const DEFAULT_ORIGIN: &str;
+    fn new_with_language(language: Language) -> HttpParts {
+        let mut parts = HttpParts::default();
+        parts.set_origin(Self::DEFAULT_ORIGIN);
+        Self::request_apply_language(&mut parts, language);
+        parts
     }
-    fn request_apply_language(req: &mut BasicRequest, language: Language);
+    fn request_apply_language(parts: &mut HttpParts, language: Language);
 }
 
-trait Endpoint {
+pub trait Endpoint {
     type Api: Api;
     const ENDPOINT: &str;
     type Return: DeserializeOwned;
 
-    fn apply_endpoint(req: &mut BasicRequest) {
-        req.append_path(Self::ENDPOINT);
+    fn get_parts(language: Language) -> HttpParts {
+        let mut parts = Self::Api::new_with_language(language);
+        Self::apply_endpoint(&mut parts);
+        parts
+    }
+
+    fn apply_endpoint(parts: &mut HttpParts) {
+        // append, not set, in case the earlier call to Api::request_apply_language
+        // set the path to something like /v3/en/ to the path
+        parts.append_path(Self::ENDPOINT);
     }
 }
-
-// trait Queryable: Endpoint {
-//     /// Send a query with the default domain
-//     fn query(client: dummy::Dummy, language: dummy::Language) -> String {
-//         Self::query_with_domain(None, client, language)
-//     }
-//     /// Send a query, optionally specifying the domain
-//     fn query_with_domain(
-//         domain: Option<&str>,
-//         client: dummy::Dummy,
-//         language: dummy::Language,
-//     ) -> String {
-//         let mut req = Self::Api::request();
-//         Self::Api::request_apply_language(&mut req, language);
-//         Self::apply_endpoint(&mut req);
-
-//         // client.request(req)
-//     }
-// }
-// impl<T> Queryable for T where T: Endpoint {}
 
 #[cfg(test)]
 mod test {
 
     use crate::{
         Api,
-        BasicRequest,
         Endpoint,
+        HttpParts,
     };
-    pub struct Dummy;
-    impl Dummy {
-        pub fn request(&self, req: BasicRequest) -> (String, Vec<(String, String)>) {
-            (req.get_url(), req.header)
-        }
-    }
 
     struct Market;
     impl Api for Market {
-        const DEFAULT_DOMAIN: &str = "https://api.warframe.market";
+        const DEFAULT_ORIGIN: &str = "https://api.warframe.market";
 
-        fn request_apply_language(req: &mut crate::BasicRequest, language: super::Language) {
+        fn request_apply_language(req: &mut crate::HttpParts, language: super::Language) {
             req.add_header("language", language);
         }
     }
@@ -158,7 +108,7 @@ mod test {
         type Return = ();
 
         const ENDPOINT: &str = "/items";
-        fn apply_endpoint(req: &mut BasicRequest) {
+        fn apply_endpoint(req: &mut HttpParts) {
             req.append_path(Self::ENDPOINT)
                 .add_query("testquery", "testval")
                 .add_query("testquery2", "testval2");
@@ -167,17 +117,20 @@ mod test {
 
     #[test]
     fn test_endpoint() {
-        let mut req = <TestEndpoint as Endpoint>::Api::request();
-        <TestEndpoint as Endpoint>::Api::request_apply_language(&mut req, super::Language::en);
-        <TestEndpoint as Endpoint>::apply_endpoint(&mut req);
+        let mut parts = <TestEndpoint as Endpoint>::get_parts(super::Language::en);
 
+        assert_eq!(parts.origin, "https://api.warframe.market");
+        assert_eq!(parts.path, vec!["items"]);
         assert_eq!(
-            (
-                "https://api.warframe.market/items?testquery=testval&testquery2=testval2"
-                    .to_owned(),
-                vec![("language".to_owned(), "en".to_owned())]
-            ),
-            Dummy.request(req)
+            parts.query,
+            vec![
+                ("testquery".to_string(), "testval".to_string()),
+                ("testquer2".to_string(), "testval2".to_string())
+            ]
+        );
+        assert_eq!(
+            parts.header,
+            vec![("language".to_string(), "en".to_string())]
         );
     }
 }
