@@ -6,7 +6,7 @@ use crate::{
 type DateTime = chrono::DateTime<chrono::Utc>;
 
 /// A Syndicate Job (aka Bounty)
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct SyndicateJob {
     /// Unique identifier for this object/event/thing
     pub id: String,

@@ -14,7 +14,7 @@ pub struct DeepArchimedea {
     pub personal_modifiers: Vec<DeepArchimedeaModifier>,
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct DeepArchimedeaMission {
     #[serde(rename = "mission")]
     pub r#type: MissionType,
@@ -22,7 +22,7 @@ pub struct DeepArchimedeaMission {
     pub risk_variables: Vec<DeepArchimedeaModifier>,
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct DeepArchimedeaModifier {
     pub key: String,
     pub name: String,

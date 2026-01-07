@@ -1,7 +1,7 @@
 use crate::internal_prelude::*;
 
 /// Represents the state on Orb Vallis
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 #[serde(rename_all = "lowercase")]
 pub enum OrbVallisState {
     /// Warm

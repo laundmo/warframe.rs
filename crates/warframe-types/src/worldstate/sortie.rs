@@ -1,9 +1,8 @@
+use super::faction::Faction;
 use crate::internal_prelude::*;
 
-use super::faction::Faction;
-
 /// A Mission corresponding to a Sortie
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct SortieMission {
     /// The i18n Mission type of this mission
     pub mission_type: String,

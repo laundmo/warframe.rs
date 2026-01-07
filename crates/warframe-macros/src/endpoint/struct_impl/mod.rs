@@ -40,8 +40,7 @@ fn first_member_of_type(fields: &Fields, type_name: &str) -> Option<Member> {
 
 pub fn parse_struct(args: TokenStream, mut item: ItemStruct) -> syn::Result<TokenStream> {
     let mut vdq = VecDeque::from(item.attrs.clone());
-    vdq.push_front(syn::parse_quote!(#[serde(rename_all = "camelCase")]));
-    vdq.push_front(syn::parse_quote!(#[derive(Debug, Clone, PartialEq, serde::Deserialize)]));
+    vdq.push_front(syn::parse_quote!(#[::warframe_macros::model]));
     item.attrs = vdq.into();
 
     // panic!("{:?}", item.attrs);

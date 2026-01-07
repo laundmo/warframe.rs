@@ -2,7 +2,7 @@
 use crate::internal_prelude::*;
 
 /// A Syndicate in Warframe
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 #[non_exhaustive]
 pub enum Syndicate {
     /// ArbitersOfHexis

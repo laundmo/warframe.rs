@@ -5,7 +5,7 @@ use super::{
 use crate::internal_prelude::*;
 
 /// Represents Relic tiers
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub enum Tier {
     /// Lith
     Lith = 1,

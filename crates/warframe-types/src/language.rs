@@ -1,6 +1,7 @@
 use derive_more::derive::Display;
+use warframe_macros::model;
 
-#[derive(Debug, Clone, PartialEq, serde::Deserialize, PartialOrd, Eq, Ord, Hash, Display)]
+#[model]
 #[serde(rename_all = "lowercase")]
 pub enum Language {
     /// German (`DE`)

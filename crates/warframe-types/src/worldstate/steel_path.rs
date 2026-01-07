@@ -1,7 +1,7 @@
 use crate::internal_prelude::*;
 
 /// An Item in Teshin's Shop
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct SteelPathShopItem {
     /// The i18n Name of the Item
     pub name: String,

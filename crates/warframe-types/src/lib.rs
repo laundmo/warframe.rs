@@ -5,9 +5,12 @@ pub use language::Language;
 
 pub type DateTime = chrono::DateTime<chrono::Utc>;
 pub(crate) mod internal_prelude {
-    pub use warframe_macros::endpoint;
+    pub(crate) use warframe_macros::{
+        endpoint,
+        model,
+    };
 
-    pub use super::{
+    pub(crate) use super::{
         DateTime,
         Market,
         Worldstate,

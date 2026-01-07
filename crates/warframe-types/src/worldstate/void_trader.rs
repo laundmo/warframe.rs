@@ -1,9 +1,11 @@
-use crate::internal_prelude::*;
-
 use super::ItemStringWrapper;
+use crate::{
+    internal_prelude::*,
+    model,
+};
 
 /// An Item in Baro's inventory
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct VoidTraderInventoryItem {
     /// The item that is being sold
     pub item: ItemStringWrapper,

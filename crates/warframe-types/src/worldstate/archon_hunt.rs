@@ -5,7 +5,7 @@ use super::{
 use crate::internal_prelude::*;
 
 /// An archon hunt mission
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct ArchonHuntMission {
     /// The i18n of the node
     pub node: String,

@@ -1,13 +1,12 @@
-use crate::internal_prelude::*;
-
 use super::{
     faction::Faction,
     mission_type::MissionType,
     reward::Reward,
 };
+use crate::internal_prelude::*;
 
 /// A mission
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct Mission {
     /// The reward of this mission
     pub reward: Reward,

@@ -2,7 +2,7 @@
 use crate::internal_prelude::*;
 
 /// Represents different reward types
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 #[serde(rename_all = "camelCase")]
 pub enum RewardType {
     /// Vauban

@@ -2,7 +2,7 @@
 use crate::internal_prelude::*;
 
 /// A Mission Type in Warframe
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub enum MissionType {
     /// AncientRetribution
     #[serde(rename = "Ancient Retribution")]

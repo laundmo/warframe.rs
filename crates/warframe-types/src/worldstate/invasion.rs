@@ -1,15 +1,14 @@
-use crate::internal_prelude::*;
-
 use super::{
     faction::Faction,
     reward::Reward,
     reward_type::RewardType,
 };
+use crate::internal_prelude::*;
 
 type DateTime = chrono::DateTime<chrono::Utc>;
 
 /// An defender/attacker of an Invasion
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub struct InvasionMember {
     /// The reward of the mission.
     pub reward: Option<Reward>,

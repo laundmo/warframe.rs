@@ -8,7 +8,7 @@ use super::damage_type::{
 };
 
 /// A Faction in Warframe
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub enum Faction {
     /// Orokin
     Orokin,

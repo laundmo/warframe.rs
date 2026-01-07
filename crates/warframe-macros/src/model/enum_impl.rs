@@ -13,7 +13,7 @@ use syn::{
 pub fn parse_enum(_args: TokenStream, mut item: ItemEnum) -> syn::Result<TokenStream> {
     // this is here to be able to have the derives at the very top
     let mut vdq = VecDeque::from(item.attrs.clone());
-    vdq.push_front(syn::parse_quote!( #[derive(Debug, PartialEq, PartialOrd, Clone, Eq, Copy, Hash, derive_more::Display)] ));
+    vdq.push_front(syn::parse_quote!( #[derive(::core::fmt::Debug, ::core::clone::Clone, ::core::cmp::PartialEq, ::core::cmp::PartialOrd, ::core::cmp::Eq, ::core::marker::Copy, ::core::hash::Hash, derive_more::Display)] ));
 
     // check whether the enum has a discriminant, and maybe implement Deserialize_repr
     match item
@@ -30,13 +30,13 @@ pub fn parse_enum(_args: TokenStream, mut item: ItemEnum) -> syn::Result<TokenSt
         )) => {
             // repr(u32) for potentially needed flexibility
             vdq.push_front(syn::parse_quote! {
-                #[derive(serde_repr::Deserialize_repr)]
+                #[derive(::serde_repr::Deserialize_repr)]
             });
             vdq.push_front(syn::parse_quote! {
                 #[repr(u32)]
             });
         }
-        _ => vdq.push_front(syn::parse_quote!( #[derive(serde::Deserialize)] )),
+        _ => vdq.push_front(syn::parse_quote!( #[derive(::serde::Deserialize)] )),
     };
 
     let opposite_trait_impl = match item.variants.len() {
@@ -49,7 +49,7 @@ pub fn parse_enum(_args: TokenStream, mut item: ItemEnum) -> syn::Result<TokenSt
             let type_name = &item.ident;
 
             Some(quote! {
-                impl crate::worldstate::models::base::Opposite for #type_name {
+                impl crate::worldstate::base::Opposite for #type_name {
                     fn opposite(&self) -> Self {
                         match self {
                             #type_name::#a => #type_name::#b,

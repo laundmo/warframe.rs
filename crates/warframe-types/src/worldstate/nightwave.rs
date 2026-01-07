@@ -3,7 +3,7 @@ use serde::Deserialize;
 use crate::internal_prelude::*;
 
 /// Represents the difficulty of a [Nightwave Challenge](NightwaveChallenge)
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 pub enum NightwaveChallengeType {
     /// Easy
     Easy,
@@ -16,7 +16,7 @@ pub enum NightwaveChallengeType {
 }
 
 /// A Nightwave challenge
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[model]
 pub struct NightwaveChallenge {
     /// Event times
     #[serde(flatten)]

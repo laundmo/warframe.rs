@@ -1,7 +1,7 @@
 use crate::internal_prelude::*;
 
 /// The State of the Cambion Drift
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 #[serde(rename_all = "lowercase")]
 pub enum CambionDriftState {
     /// The 'Vome' state

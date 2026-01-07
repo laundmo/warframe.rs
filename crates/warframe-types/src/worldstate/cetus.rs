@@ -1,7 +1,7 @@
 use crate::internal_prelude::*;
 
 /// Represents the current state on cetus
-#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
+#[model]
 #[serde(rename_all = "lowercase")]
 pub enum CetusState {
     /// Represents Cetus' day state
