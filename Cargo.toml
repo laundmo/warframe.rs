@@ -10,10 +10,6 @@ repository = "https://github.com/Mettwasser/warframe.rs"
 license = "MIT"
 rust-version = "1.91"
 
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-
 [features]
 default = ["market_ratelimit", "market_cache"]
 
@@ -22,25 +18,34 @@ full = ["market_ratelimit", "market_cache"]
 market_ratelimit = ["dep:governor"]
 market_cache = ["dep:moka"]
 
+
 [dependencies]
+# workspace desp
+warframe-macros = { path = "crates/warframe-macros", version = "9.0.1" }
+
+# async web requests
 tokio = { version = "1.48.0", features = ["full"] }
 reqwest = { version = "0.12.28", features = ["json"] }
+moka = { version = "0.12.12", optional = true, features = ["future"] }
+governor = { version = "0.10.4", optional = true }
+
+# time
 chrono = { version = "0.4.42", features = ["serde", "clock"] }
+
+# serialization
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.148" }
 serde_repr = "0.1.20"
-futures = "0.3.31"
-thiserror = "2.0.17"
-moka = { version = "0.12.12", optional = true, features = ["future"] }
-urlencoding = "2.1.3"
-derive_more = { version = "2.1.1", features = ["full"] }
 serde_with = { version = "3.16.1" }
-warframe-macros = { path = "warframe-macros", version = "9.0.1" }
-paste = "1.0.15"
+
+# utility
+thiserror = "2.0.17"
+urlencoding = "2.1.3"
 tracing = "0.1.44"
-governor = { version = "0.10.4", optional = true }
+
+# 
+derive_more = { version = "2.1.1", features = ["full"] }
 derive_builder = "0.20.2"
-heck = "0.5.0"
 
 [dev-dependencies]
 rstest = "0.25.0"
@@ -51,4 +56,8 @@ pedantic = "warn"
 
 [workspace]
 resolver = "3"
-members = ["warframe-macros", "."]
+members = ["crates/*", "."]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

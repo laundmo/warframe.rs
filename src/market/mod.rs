@@ -22,7 +22,6 @@ pub use error::{
     Error,
     Result,
 };
-use heck::ToSnakeCase;
 pub use models::{
     Queryable,
     ResponseBase,
@@ -105,7 +104,7 @@ pub struct Slug(String);
 impl Slug {
     #[must_use]
     pub fn new(input: &str) -> Self {
-        Self(input.to_snake_case())
+        Self(input.to_lowercase().replace(' ', "_"))
     }
 
     /// Creates a new `Slug` from a raw string without converting it to snake case.
