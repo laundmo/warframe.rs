@@ -152,8 +152,8 @@ mod test {
             req.add_header("language", language);
         }
     }
-    struct TestQueryable;
-    impl Endpoint for TestQueryable {
+    struct TestEndpoint;
+    impl Endpoint for TestEndpoint {
         type Api = Market;
         type Return = ();
 
@@ -167,9 +167,9 @@ mod test {
 
     #[test]
     fn test_endpoint() {
-        let mut req = <TestQueryable as Endpoint>::Api::request();
-        <TestQueryable as Endpoint>::Api::request_apply_language(&mut req, super::Language::en);
-        <TestQueryable as Endpoint>::apply_endpoint(&mut req);
+        let mut req = <TestEndpoint as Endpoint>::Api::request();
+        <TestEndpoint as Endpoint>::Api::request_apply_language(&mut req, super::Language::en);
+        <TestEndpoint as Endpoint>::apply_endpoint(&mut req);
 
         assert_eq!(
             (
