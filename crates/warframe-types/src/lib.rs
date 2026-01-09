@@ -73,7 +73,7 @@ impl HttpParts {
 }
 
 pub trait Api {
-    type ApiErrorJson: DeserializeOwned;
+    type ErrorJson: DeserializeOwned;
     const DEFAULT_ORIGIN: &str;
     fn new_with_language(language: Language) -> HttpParts {
         let mut parts = HttpParts::default();
@@ -113,7 +113,7 @@ mod test {
 
     struct Market;
     impl Api for Market {
-        type ApiErrorJson = ();
+        type ErrorJson = ();
         const DEFAULT_ORIGIN: &str = "https://api.warframe.market";
 
         fn request_apply_language(req: &mut crate::HttpParts, language: super::Language) {

@@ -33,19 +33,24 @@ pub enum Error<T: DeserializeOwned> {
     #[error("Error response from the API: {0}")]
     ApiError(T),
 }
+
+// this exists to make serde try to deserialize
+// first the expected type (Endpoint::Return)
+// and then the error type (Endpoit::Api::ErrorJson)
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum ApiResponse<T, E> {
     Success(T),
     Error(E),
 }
+
 pub trait Queryable: Endpoint {
     /// Send a query with the default domain
     fn query(
         client: &reqwest::Client,
         language: Language,
     ) -> impl std::future::Future<
-        Output = Result<Self::Return, Error<<Self::Api as Api>::ApiErrorJson>>,
+        Output = Result<Self::Return, Error<<Self::Api as Api>::ErrorJson>>,
     > + Send {
         Self::query_with_domain(None, client, language)
     }
@@ -55,7 +60,7 @@ pub trait Queryable: Endpoint {
         client: &reqwest::Client,
         language: Language,
     ) -> impl std::future::Future<
-        Output = Result<Self::Return, Error<<Self::Api as Api>::ApiErrorJson>>,
+        Output = Result<Self::Return, Error<<Self::Api as Api>::ErrorJson>>,
     > + Send {
         let mut req = Self::get_parts(language);
         if let Some(domain) = domain {
@@ -73,7 +78,7 @@ pub trait Queryable: Endpoint {
             let response = builder
                 .send()
                 .await?
-                .json::<ApiResponse<Self::Return, <Self::Api as Api>::ApiErrorJson>>()
+                .json::<ApiResponse<Self::Return, <Self::Api as Api>::ErrorJson>>()
                 .await?;
             match response {
                 ApiResponse::Success(data) => Ok(data),

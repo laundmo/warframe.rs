@@ -45,7 +45,7 @@ pub struct ResponseBase<T> {
 pub struct Market;
 impl Api for Market {
     const DEFAULT_ORIGIN: &str = "https://api.warframe.market";
-    type ApiErrorJson = Option<String>;
+    type ErrorJson = Option<String>;
 
     fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
         parts.add_header("language", language.get_market_string());

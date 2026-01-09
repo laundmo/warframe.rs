@@ -144,7 +144,7 @@ pub struct ApiErrorResponse {
 
 pub struct Worldstate;
 impl Api for Worldstate {
-    type ApiErrorJson = ApiErrorResponse;
+    type ErrorJson = ApiErrorResponse;
     const DEFAULT_ORIGIN: &str = "";
     fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
         parts.add_query("language", language);
