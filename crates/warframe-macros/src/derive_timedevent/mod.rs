@@ -11,7 +11,11 @@ use syn::{
 
 fn matches_type_name(ty: &Type, name: &str) -> bool {
     if let Type::Path(path) = ty {
-        path.path.get_ident().is_some_and(|i| i == name)
+        path.path
+            .segments
+            .iter()
+            .last()
+            .is_some_and(|i| i.ident.to_string().ends_with(name))
     } else {
         false
     }
@@ -37,7 +41,7 @@ fn first_member_of_type(fields: &Fields, type_name: &str) -> Option<Member> {
 #[cfg(feature = "worldstate")]
 pub fn expand(item: syn::DeriveInput) -> syn::Result<TokenStream> {
     let struct_name = item.ident;
-    const TIMED_NAME: &str = "Timed";
+    const TIMED_NAME: &str = "EventTimes";
     let Data::Struct(ref data) = item.data else {
         bail!("cannot derive TimedEvent for non-struct types.");
     };
@@ -48,11 +52,11 @@ pub fn expand(item: syn::DeriveInput) -> syn::Result<TokenStream> {
             impl crate::worldstate::TimedEvent for #struct_name {
                 #[doc = "Returns the time when this event began"]
                 fn activation(&self) -> chrono::DateTime<chrono::Utc> {
-                    self.#timef.activation
+                    self.#timef.activation.unwrap()
                 }
                 #[doc = "Returns the time when this event ends"]
                 fn expiry(&self) -> chrono::DateTime<chrono::Utc> {
-                    self.#timef.expiry
+                    self.#timef.expiry.unwrap()
                 }
             }
         }

@@ -13,7 +13,7 @@ use warframe_types::{
 
 pub mod worldstate;
 
-pub mod market;
+// pub mod market;
 
 // #[cfg(feature = "profile")]
 // pub mod profile;
@@ -69,18 +69,18 @@ pub trait Queryable: Endpoint {
         async move {
             let url = format!("{}/{}", req.origin, req.path.join("/"));
             let mut builder = client.get(url);
-            for q in req.query.iter() {
-                builder = builder.query(q);
+            for q in &req.query {
+                builder = builder.query(&[q]);
             }
-            for (k, v) in req.header.iter() {
+            for (k, v) in &req.header {
                 builder = builder.header(k, v);
             }
-            let response = builder
-                .send()
-                .await?
+            let response = builder.send().await?;
+            // dbg!(response.url());
+            let json = response
                 .json::<ApiResponse<Self::Return, <Self::Api as Api>::ErrorJson>>()
                 .await?;
-            match response {
+            match json {
                 ApiResponse::Success(data) => Ok(data),
                 ApiResponse::Error(err) => Err(Error::ApiError(err)),
             }

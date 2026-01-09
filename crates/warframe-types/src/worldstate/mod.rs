@@ -147,6 +147,7 @@ impl Api for Worldstate {
     type ErrorJson = ApiErrorResponse;
     const DEFAULT_ORIGIN: &str = "";
     fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
+        parts.path.insert(0, "pc".to_string());
         parts.add_query("language", language);
     }
 }

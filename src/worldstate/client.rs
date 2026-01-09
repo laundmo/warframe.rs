@@ -100,7 +100,7 @@ impl Default for Client {
     fn default() -> Self {
         Self {
             http: reqwest::Client::new(),
-            base_url: "https://api.warframestat.us".into(),
+            base_url: "https://api.warframestat.us/".into(),
             config: Arc::new(ClientConfig::default()),
             type_cache: Cache::builder()
                 .time_to_live(Duration::from_mins(5))

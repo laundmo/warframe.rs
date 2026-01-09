@@ -67,6 +67,7 @@ pub use warframe_types::worldstate::{
         NightwaveChallengeType,
     },
     orb_vallis::OrbVallisState,
+    queryable,
     reward::Reward,
     reward_type::RewardType,
     sortie::SortieMission,
@@ -79,7 +80,7 @@ pub use warframe_types::worldstate::{
 };
 
 use crate::Error;
-type WorldstateError = Error<warframe_types::worldstate::ApiErrorResponse>;
+pub type WorldstateError = Error<warframe_types::worldstate::ApiErrorResponse>;
 
 pub trait ItemStringWrapperQuery {
     async fn query(&self, client: Client) -> Result<Option<Item>, WorldstateError>;

@@ -11,17 +11,28 @@ pub enum CetusState {
 }
 
 /// The Information about cetus
-#[endpoint(Worldstate:"/cetusCycle" -> Self)]
+#[derive(
+    ::warframe_macros::TimedEvent,
+    ::core::fmt::Debug,
+    ::core::clone::Clone,
+    ::core::cmp::PartialEq,
+    serde::Deserialize,
+)]
+#[serde(rename_all = "camelCase")]
+#[doc = " The Information about cetus"]
 pub struct Cetus {
-    /// Event times
+    #[doc = " The id of the cycle"]
+    pub id: String,
+    #[doc = " The state of Cetus (day/night)"]
+    pub state: CetusState,
+    #[doc = " Event times"]
     #[serde(flatten)]
     pub times: crate::EventTimes,
-
-    /// The id of the cycle
-    pub id: String,
-
-    /// The state of Cetus (day/night)
-    pub state: CetusState,
+}
+impl crate::Endpoint for Cetus {
+    type Return = Self;
+    type Api = Worldstate;
+    const ENDPOINT: &str = "/cetusCycle";
 }
 
 #[cfg(test)]
