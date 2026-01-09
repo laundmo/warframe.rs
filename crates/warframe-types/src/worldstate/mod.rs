@@ -145,9 +145,8 @@ pub struct ApiErrorResponse {
 pub struct Worldstate;
 impl Api for Worldstate {
     type ErrorJson = ApiErrorResponse;
-    const DEFAULT_ORIGIN: &str = "";
+    const DEFAULT_ORIGIN: &str = "https://api.warframestat.us/pc";
     fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
-        parts.path.insert(0, "pc".to_string());
         parts.add_query("language", language);
     }
 }
