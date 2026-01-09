@@ -20,7 +20,7 @@ pub enum Language {
     PT,
     /// Russian (`RU`)
     RU,
-    /// Chinese (`ZH`), zh-hans
+    /// Chinese (`ZH`, `zh-hans`)
     #[serde(alias = "zh-hans")]
     ZH,
     /// English (`EN`)
@@ -31,7 +31,7 @@ pub enum Language {
     TR,
     /// Japanese (`JA`)
     JA,
-    /// Traditional Chinese (`TC`), zh-hant
+    /// Traditional Chinese (`TC`, `zh-hant`)
     #[serde(alias = "zh-hant")]
     TC,
     /// Thai (`TH`)

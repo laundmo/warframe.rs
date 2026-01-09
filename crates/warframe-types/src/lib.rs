@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use serde::de::DeserializeOwned;
 mod language;
 pub use language::Language;
@@ -8,10 +10,10 @@ pub(crate) mod internal_prelude {
         model,
     };
 
-    pub(crate) use super::{
-        Market,
-        Worldstate,
-    };
+    #[cfg(feature = "market")]
+    pub(crate) use super::market::Market;
+    #[cfg(feature = "worldstate")]
+    pub(crate) use super::worldstate::Worldstate;
     #[cfg(feature = "worldstate")]
     pub(crate) use crate::worldstate::base::{
         DateTime,
@@ -27,23 +29,6 @@ pub mod market;
 pub mod profile;
 #[cfg(feature = "worldstate")]
 pub mod worldstate;
-
-pub struct Market;
-impl Api for Market {
-    const DEFAULT_ORIGIN: &str = "https://api.warframe.market";
-
-    fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
-        parts.add_header("language", language.get_market_string());
-    }
-}
-
-pub struct Worldstate;
-impl Api for Worldstate {
-    const DEFAULT_ORIGIN: &str = "";
-    fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
-        parts.add_query("language", language);
-    }
-}
 
 #[derive(Default, Debug)]
 pub struct HttpParts {
@@ -88,6 +73,7 @@ impl HttpParts {
 }
 
 pub trait Api {
+    type ApiErrorJson: DeserializeOwned;
     const DEFAULT_ORIGIN: &str;
     fn new_with_language(language: Language) -> HttpParts {
         let mut parts = HttpParts::default();
@@ -101,7 +87,7 @@ pub trait Api {
 pub trait Endpoint {
     type Api: Api;
     const ENDPOINT: &str;
-    type Return: DeserializeOwned;
+    type Return: DeserializeOwned + Clone + Send + Sync + 'static;
 
     fn get_parts(language: Language) -> HttpParts {
         let mut parts = Self::Api::new_with_language(language);
@@ -127,6 +113,7 @@ mod test {
 
     struct Market;
     impl Api for Market {
+        type ApiErrorJson = ();
         const DEFAULT_ORIGIN: &str = "https://api.warframe.market";
 
         fn request_apply_language(req: &mut crate::HttpParts, language: super::Language) {
@@ -148,7 +135,7 @@ mod test {
 
     #[test]
     fn test_endpoint() {
-        let mut parts = <TestEndpoint as Endpoint>::get_parts(super::Language::EN);
+        let parts = <TestEndpoint as Endpoint>::get_parts(super::Language::EN);
 
         assert_eq!(parts.origin, "https://api.warframe.market");
         assert_eq!(parts.path, vec!["items"]);

@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use super::i18n::I18N;
+use super::I18N;
 
 /// Represents the `/riven/attributes` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]

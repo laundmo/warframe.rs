@@ -1,10 +1,7 @@
 use std::collections::VecDeque;
 
 use enum_impl::parse_enum;
-use proc_macro2::{
-    Span,
-    TokenStream,
-};
+use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{
     Item,
@@ -14,7 +11,7 @@ use syn::{
 
 mod enum_impl;
 
-pub fn parse_struct(args: TokenStream, mut item: ItemStruct) -> syn::Result<TokenStream> {
+pub fn parse_struct(_: TokenStream, mut item: ItemStruct) -> syn::Result<TokenStream> {
     let mut vdq = VecDeque::from(item.attrs.clone());
     vdq.push_front(syn::parse_quote!(#[serde(rename_all = "camelCase")]));
     vdq.push_front(syn::parse_quote!(#[derive(::core::fmt::Debug, ::core::clone::Clone, ::core::cmp::PartialEq, serde::Deserialize, ::warframe_macros::TimedEvent)]));

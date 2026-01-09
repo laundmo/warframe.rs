@@ -25,52 +25,22 @@
 //! ```
 
 pub mod client;
-pub mod error;
-mod models;
 pub mod utils;
 
-pub mod language;
 mod listener;
 mod listener_nested;
 
-/// A module that re-exports every type that is queryable
-pub mod queryable {
-    pub use super::models::{
-        alert::Alert,
-        arbitration::Arbitration,
-        archon_hunt::ArchonHunt,
-        cambion_drift::CambionDrift,
-        cetus::Cetus,
-        construction_progress::ConstructionProgress,
-        daily_deal::DailyDeal,
-        deep_archimedea::DeepArchimedea,
-        event::Event,
-        fissure::Fissure,
-        flash_sale::FlashSale,
-        global_upgrades::GlobalUpgrade,
-        invasion::Invasion,
-        news::News,
-        nightwave::Nightwave,
-        orb_vallis::OrbVallis,
-        sortie::Sortie,
-        steel_path::SteelPath,
-        syndicate::Syndicate,
-        void_trader::VoidTrader,
-    };
-}
-
 pub use client::Client;
-pub use error::{
-    ApiErrorResponse,
-    Error,
-};
-pub use language::Language;
-pub use models::{
+pub use utils::Change;
+/// This is a re-export of the `model` macro in case you want to use it in your own code.
+/// To implement a, for example, missing model.
+pub use warframe_macros::model;
+use warframe_types::Language;
+pub use warframe_types::worldstate::{
+    ItemStringWrapper,
     archon_hunt::ArchonHuntMission,
     base::{
-        Endpoint,
         Opposite,
-        Queryable,
         TimedEvent,
     },
     cambion_drift::CambionDriftState,
@@ -89,6 +59,7 @@ pub use models::{
     fissure::Tier,
     invasion::InvasionMember,
     items,
+    items::Item,
     mission::Mission,
     mission_type::MissionType,
     nightwave::{
@@ -106,7 +77,61 @@ pub use models::{
     },
     void_trader::VoidTraderInventoryItem,
 };
-pub use utils::Change;
-/// This is a re-export of the `model` macro in case you want to use it in your own code.
-/// To implement a, for example, missing model.
-pub use warframe_macros::model;
+
+use crate::Error;
+type WorldstateError = Error<warframe_types::worldstate::ApiErrorResponse>;
+
+pub trait ItemStringWrapperQuery {
+    async fn query(&self, client: Client) -> Result<Option<Item>, WorldstateError>;
+    async fn query_using_lang(
+        &self,
+        client: Client,
+        language: Language,
+    ) -> Result<Option<Item>, WorldstateError>;
+}
+
+impl ItemStringWrapperQuery for ItemStringWrapper {
+    /// Queries an item using the provided client.
+    ///
+    /// This is a convenience function.
+    ///
+    /// # Arguments
+    ///
+    /// * `client` - The client used to query the item.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if it
+    /// fails.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the client fails to query the item.
+    async fn query(&self, client: Client) -> Result<Option<Item>, WorldstateError> {
+        client.query_item(self.inner()).await
+    }
+
+    /// Queries an item using the provided client with the provided localization
+    ///
+    /// This is a convenience function.
+    ///
+    /// # Arguments
+    ///
+    /// * `client` - The client used to query the item.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if it
+    /// fails.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the client fails to query the item.
+    async fn query_using_lang(
+        &self,
+        client: Client,
+        language: Language,
+    ) -> Result<Option<Item>, WorldstateError> {
+        client.query_item_using_lang(self.inner(), language).await
+    }
+}

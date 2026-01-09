@@ -1,10 +1,15 @@
-use crate::worldstate::{
-    Change,
-    Client,
-    Error,
+use warframe_types::worldstate::Worldstate;
+
+use crate::{
     Queryable,
-    TimedEvent,
-    utils::CrossDiff,
+    worldstate::{
+        Change,
+        Client,
+        Error,
+        TimedEvent,
+        WorldstateError,
+        utils::CrossDiff,
+    },
 };
 
 fn ignore_state<F, T>(f: F) -> impl for<'a> AsyncFn((), &'a T, Change)
@@ -51,9 +56,12 @@ impl Client {
     /// }
     /// ```
     #[allow(clippy::missing_panics_doc, clippy::missing_errors_doc)]
-    pub async fn call_on_nested_update<T, Callback>(&self, callback: Callback) -> Result<(), Error>
+    pub async fn call_on_nested_update<T, Callback>(
+        &self,
+        callback: Callback,
+    ) -> Result<(), WorldstateError>
     where
-        T: TimedEvent + Queryable<Return = Vec<T>> + PartialEq,
+        T: TimedEvent + Queryable<Return = Vec<T>, Api = Worldstate> + PartialEq,
         for<'any> Callback: AsyncFn(&'any T, Change),
     {
         self.call_on_nested_update_inner(ignore_state(callback), ())
@@ -104,10 +112,10 @@ impl Client {
         &self,
         callback: Callback,
         state: S,
-    ) -> Result<(), Error>
+    ) -> Result<(), WorldstateError>
     where
         S: Sized + Send + Sync + Clone,
-        T: Queryable<Return = Vec<T>> + TimedEvent + PartialEq,
+        T: Queryable<Return = Vec<T>, Api = Worldstate> + TimedEvent + PartialEq,
         for<'any> Callback: AsyncFn(S, &'any T, Change),
     {
         self.call_on_nested_update_inner(callback, state).await
@@ -118,10 +126,10 @@ impl Client {
         &self,
         callback: Callback,
         state: S,
-    ) -> Result<(), Error>
+    ) -> Result<(), WorldstateError>
     where
         S: Sized + Send + Sync + Clone,
-        T: Queryable<Return = Vec<T>> + TimedEvent + PartialEq,
+        T: Queryable<Return = Vec<T>, Api = Worldstate> + TimedEvent + PartialEq,
         for<'any> Callback: AsyncFn(S, &'any T, Change),
     {
         tracing::debug!(

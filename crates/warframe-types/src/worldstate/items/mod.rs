@@ -192,14 +192,14 @@ pub enum Rarity {
 pub enum Item {
     #[serde(rename = "Arcanes")]
     Arcane(Arcane),
-    Archwing(Archwing),
+    Archwing(Archwing), // note: perhaps box in the future, 264 bytes
     Fish(MinimalItem),
     Gear(Gear),
     #[serde(rename = "Glyphs")]
     Glyph(MinimalItem),
     Misc(Misc),
     #[serde(rename = "Mods")]
-    Mod(Mod),
+    Mod(Mod), // note: perhaps box in the future, 304 bytes
     Node(Node),
     #[serde(rename = "Pets")]
     Pet(Pet),
@@ -228,22 +228,6 @@ pub enum Item {
     )]
     Weapon(Box<Weapon>),
 }
-
-// impl Item {
-//     pub(crate) async fn query(http: reqwest::Client, url: String) -> Result<Option<Item>, Error>
-// {         let response = http.get(url).send().await?;
-
-//         if response.status() == StatusCode::NOT_FOUND {
-//             return Ok(None);
-//         }
-
-//         let json = response.text().await?;
-
-//         let item = serde_json::from_str::<Item>(&json)?;
-
-//         Ok(Some(item))
-//     }
-// }
 
 #[cfg(test)]
 mod test {

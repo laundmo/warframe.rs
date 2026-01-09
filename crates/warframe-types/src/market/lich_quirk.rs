@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use super::i18n::I18N;
+use super::I18N;
 
 /// Represents the `/lich/quirks` endpoint
 #[derive(Debug, Deserialize, PartialEq, Clone)]

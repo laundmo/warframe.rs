@@ -1,10 +1,13 @@
 use chrono::TimeDelta;
+use warframe_types::worldstate::Worldstate;
 
-use crate::worldstate::{
-    self,
-    Client,
+use crate::{
     Queryable,
-    TimedEvent,
+    worldstate::{
+        self,
+        Client,
+        TimedEvent,
+    },
 };
 
 fn ignore_state<F, T>(f: F) -> impl for<'a, 'b> AsyncFn((), &'a T, &'b T)
@@ -17,7 +20,7 @@ where
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
 pub enum ListenerError {
-    Worldstate(#[from] worldstate::Error),
+    Worldstate(#[from] worldstate::WorldstateError),
 
     /// An error raised when [`chrono::TimeDelta::to_std`] fails.
     ///
@@ -58,7 +61,7 @@ impl Client {
     #[allow(clippy::missing_panics_doc, clippy::missing_errors_doc)]
     pub async fn call_on_update<T, Callback>(&self, callback: Callback) -> Result<(), ListenerError>
     where
-        T: TimedEvent + Queryable<Return = T>,
+        T: TimedEvent + Queryable<Return = T, Api = Worldstate>,
         for<'a, 'b> Callback: AsyncFn(&'a T, &'b T),
     {
         self.call_on_update_inner(ignore_state(callback), ()).await
@@ -109,7 +112,7 @@ impl Client {
     ) -> Result<(), ListenerError>
     where
         S: Sized + Send + Sync + Clone,
-        T: TimedEvent + Queryable<Return = T>,
+        T: TimedEvent + Queryable<Return = T, Api = Worldstate>,
         for<'a, 'b> Callback: AsyncFn(S, &'a T, &'b T),
     {
         self.call_on_update_inner(callback, state).await
@@ -126,7 +129,7 @@ impl Client {
     ) -> Result<(), ListenerError>
     where
         S: Sized + Send + Sync + Clone,
-        T: TimedEvent + Queryable<Return = T>,
+        T: TimedEvent + Queryable<Return = T, Api = Worldstate>,
         for<'a, 'b> Callback: AsyncFn(S, &'a T, &'b T),
     {
         let mut item = self.fetch::<T>().await?;

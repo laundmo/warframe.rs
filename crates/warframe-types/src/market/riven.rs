@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use super::{
-    i18n::I18N,
+    I18N,
     riven_group::RivenGroup,
     riven_type::RivenType,
 };

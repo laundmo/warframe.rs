@@ -1,5 +1,3 @@
-use warframe_macros::TimedEvent;
-
 use super::{
     faction::Faction,
     mission_type::MissionType,

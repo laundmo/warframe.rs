@@ -1,5 +1,3 @@
-use serde::Deserialize;
-
 use crate::internal_prelude::*;
 
 /// Represents the difficulty of a [Nightwave Challenge](NightwaveChallenge)

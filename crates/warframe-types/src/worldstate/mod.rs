@@ -42,10 +42,16 @@
 //! }
 //! ```
 
+pub mod base;
+pub use base::{
+    EventTimes,
+    Opposite,
+    TimedEvent,
+};
+
 pub mod alert;
 pub mod arbitration;
 pub mod archon_hunt;
-pub mod base;
 pub mod cambion_drift;
 pub mod cetus;
 pub mod construction_progress;
@@ -72,56 +78,36 @@ pub mod steel_path;
 pub mod syndicate;
 pub mod syndicate_mission;
 pub mod void_trader;
-use items::Item;
+
+pub mod queryable {
+    pub use super::{
+        alert::Alert,
+        arbitration::Arbitration,
+        archon_hunt::ArchonHunt,
+        cambion_drift::CambionDrift,
+        cetus::Cetus,
+        construction_progress::ConstructionProgress,
+        daily_deal::DailyDeal,
+        deep_archimedea::DeepArchimedea,
+        event::Event,
+        fissure::Fissure,
+        flash_sale::FlashSale,
+        global_upgrades::GlobalUpgrade,
+        invasion::Invasion,
+        news::News,
+        nightwave::Nightwave,
+        orb_vallis::OrbVallis,
+        sortie::Sortie,
+        steel_path::SteelPath,
+        syndicate::Syndicate,
+        void_trader::VoidTrader,
+    };
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Deserialize)]
 pub struct ItemStringWrapper(String);
 
 impl ItemStringWrapper {
-    //     /// Queries an item using the provided client.
-    //     ///
-    //     /// This is a convenience function.
-    //     ///
-    //     /// # Arguments
-    //     ///
-    //     /// * `client` - The client used to query the item.
-    //     ///
-    //     /// # Returns
-    //     ///
-    //     /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if
-    // it     /// fails.
-    //     ///
-    //     /// # Errors
-    //     ///
-    //     /// This function will return an error if the client fails to query the item.
-    //     pub async fn query(&self, client: Client) -> Result<Option<Item>, Error> {
-    //         client.query_item(&self.0).await
-    //     }
-
-    //     /// Queries an item using the provided client with the provided localization
-    //     ///
-    //     /// This is a convenience function.
-    //     ///
-    //     /// # Arguments
-    //     ///
-    //     /// * `client` - The client used to query the item.
-    //     ///
-    //     /// # Returns
-    //     ///
-    //     /// A `Result` containing an `Option<Item>` if the query is successful, or an `Error` if
-    // it     /// fails.
-    //     ///
-    //     /// # Errors
-    //     ///
-    //     /// This function will return an error if the client fails to query the item.
-    //     pub async fn query_using_lang(
-    //         &self,
-    //         client: Client,
-    //         language: Language,
-    //     ) -> Result<Option<Item>, Error> {
-    //         client.query_item_using_lang(&self.0, language).await
-    //     }
-
     #[must_use]
     pub fn inner(&self) -> &str {
         &self.0
@@ -136,5 +122,31 @@ impl ItemStringWrapper {
 impl AsRef<str> for ItemStringWrapper {
     fn as_ref(&self) -> &str {
         &self.0
+    }
+}
+use serde::Deserialize;
+
+use crate::{
+    Api,
+    Language,
+};
+
+/// The `ApiErrorResponse` struct represents an error with a string message and an error code.
+/// This is "as is", meaning this is how the API returns this error.
+#[derive(Debug, Deserialize, thiserror::Error)]
+#[error("{error} [CODE {code}]")]
+pub struct ApiErrorResponse {
+    /// The error message
+    pub error: String,
+    /// The status code returned
+    pub code: u16,
+}
+
+pub struct Worldstate;
+impl Api for Worldstate {
+    type ApiErrorJson = ApiErrorResponse;
+    const DEFAULT_ORIGIN: &str = "";
+    fn request_apply_language(parts: &mut crate::HttpParts, language: Language) {
+        parts.add_query("language", language);
     }
 }

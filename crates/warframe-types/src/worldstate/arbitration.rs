@@ -4,7 +4,6 @@ use serde::{
 };
 
 use super::{
-    base::TimedEvent,
     faction::Faction,
     mission_type::MissionType,
 };

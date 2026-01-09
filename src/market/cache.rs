@@ -3,7 +3,7 @@ use std::{
     sync::Arc,
 };
 
-use super::models::i18n::Language;
+use warframe_types::Language;
 
 pub type Slugs = Arc<HashSet<String>>;
 

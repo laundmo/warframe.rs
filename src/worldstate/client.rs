@@ -13,13 +13,19 @@ use std::{
 };
 
 use moka::future::Cache;
-use warframe_types::Endpoint;
+use reqwest::StatusCode;
+use warframe_types::{
+    Endpoint,
+    Language,
+    worldstate::{
+        Worldstate,
+        items::Item,
+    },
+};
 
-use super::{
+use crate::{
     Queryable,
-    error::Error,
-    language::Language,
-    models::items::Item,
+    worldstate::WorldstateError,
 };
 
 #[derive(Debug, Clone)]
@@ -125,10 +131,14 @@ impl Client {
         }
     }
 
-    async fn type_cached<T, F>(&self, language: Language, fallback: F) -> Result<T::Return, Error>
+    async fn type_cached<T, F>(
+        &self,
+        language: Language,
+        fallback: F,
+    ) -> Result<T::Return, WorldstateError>
     where
         T: Queryable,
-        F: AsyncFnOnce() -> Result<T::Return, Error>,
+        F: AsyncFnOnce() -> Result<T::Return, WorldstateError>,
     {
         let type_id = TypeId::of::<T::Return>();
 
@@ -174,9 +184,9 @@ impl Client {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn fetch<T>(&self) -> Result<T::Return, Error>
+    pub async fn fetch<T>(&self) -> Result<T::Return, WorldstateError>
     where
-        T: Queryable,
+        T: Queryable + Endpoint<Api = Worldstate>,
     {
         self.fetch_using_lang::<T>(Language::EN).await
     }
@@ -206,12 +216,15 @@ impl Client {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn fetch_using_lang<T>(&self, language: Language) -> Result<T::Return, Error>
+    pub async fn fetch_using_lang<T>(
+        &self,
+        language: Language,
+    ) -> Result<T::Return, WorldstateError>
     where
-        T: Queryable,
+        T: Queryable + Endpoint<Api = Worldstate>,
     {
         self.type_cached::<T, _>(language, async || {
-            T::query(&self.base_url.clone(), &self.http.clone(), language).await
+            T::query_with_domain(Some(&self.base_url.clone()), &self.http.clone(), language).await
         })
         .await
     }
@@ -221,9 +234,9 @@ impl Client {
         language: Language,
         query: &str,
         fallback: F,
-    ) -> Result<Option<Item>, Error>
+    ) -> Result<Option<Item>, WorldstateError>
     where
-        F: AsyncFnOnce() -> Result<Option<Item>, Error>,
+        F: AsyncFnOnce() -> Result<Option<Item>, WorldstateError>,
     {
         let key = (language, Box::from(query));
         if let Some(item) = self.items_cache.get(&key).await {
@@ -268,7 +281,7 @@ impl Client {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn query_item(&self, query: &str) -> Result<Option<Item>, Error> {
+    pub async fn query_item(&self, query: &str) -> Result<Option<Item>, WorldstateError> {
         self.query_item_using_lang(query, Language::EN).await
     }
 
@@ -301,7 +314,7 @@ impl Client {
         &self,
         query: &str,
         language: Language,
-    ) -> Result<Option<Item>, Error> {
+    ) -> Result<Option<Item>, WorldstateError> {
         self.cached_item(language, query, async move || {
             Item::query(
                 self.http.clone(),
@@ -317,35 +330,21 @@ impl Client {
         .await
     }
 }
+pub(crate) trait ItemQuery {
+    async fn query(http: reqwest::Client, url: String) -> Result<Option<Item>, WorldstateError>;
+}
+impl ItemQuery for Item {
+    async fn query(http: reqwest::Client, url: String) -> Result<Option<Item>, WorldstateError> {
+        let response = http.get(url).send().await?;
 
-trait Queryable: Endpoint {
-    /// Send a query with the default domain
-    fn query(
-        client: &reqwest::Client,
-        language: dummy::Language,
-    ) -> impl std::future::Future<Output = Result<Self::Return, Error>> + Send {
-        Self::query_with_domain(None, client, language)
-    }
-    /// Send a query, optionally specifying the domain
-    fn query_with_domain(
-        domain: Option<&str>,
-        client: &reqwest::Client,
-        language: dummy::Language,
-    ) -> impl std::future::Future<Output = Result<Self::Return, Error>> + Send {
-        let mut req = Self::get_parts(language);
-        if let Some(domain) = domain {
-            req.set_origin(domain);
+        if response.status() == StatusCode::NOT_FOUND {
+            return Ok(None);
         }
-        async move {
-            let url = format!("{}/{}", req.origin, req.path.join("/"));
-            let mut builder = client.get(url);
-            for q in req.query.iter() {
-                builder = builder.query(q);
-            }
-            for (k, v) in req.header.iter() {
-                builder = builder.header(k, v);
-            }
-            Ok(builder.send().await?.json::<Self::Return>().await?)
-        }
+
+        let json = response.text().await?;
+
+        let item = serde_json::from_str::<Item>(&json)?;
+
+        Ok(Some(item))
     }
 }
